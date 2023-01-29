@@ -1,0 +1,47 @@
+version: "3"
+services:
+  web:
+    container_name: web-francrodriguez
+    volumes:
+      - ./web/.env:/var/www/.env
+    expose:
+      - "9000"
+    restart: always
+    networks:
+      - prod-network
+  webserver:
+    container_name: webserver-francrodriguez
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - web
+    networks:
+      - prod-network
+  redis:
+    image: redis:7.0.5
+    container_name: redis-francrodriguez
+    expose:
+      - "6379"
+    restart: always
+    networks:
+      - prod-network
+  db:
+    image: mysql:8.0.31
+    container_name: db-francrodriguez
+    restart: always
+    expose:
+      - "3306"
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      TZ: Europe/Madrid
+    networks:
+     - prod-network
+networks:
+    prod-network:
